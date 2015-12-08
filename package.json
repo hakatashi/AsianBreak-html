@@ -4,7 +4,8 @@
   "description": "Automatically strip breaklines from HTML for east asian people, based on new CSS3 spec of white-space property.",
   "main": "index.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test",
+    "build": "gulp build"
   },
   "repository": {
     "type": "git",
@@ -28,5 +29,11 @@
     "asianbreak": "^1.0.1",
     "html-tokenize": "^1.2.5",
     "readable-stream": "^2.0.4"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-livescript": "^3.0.0",
+    "gulp-mocha": "^2.2.0",
+    "livescript": "^1.4.0"
   }
 }

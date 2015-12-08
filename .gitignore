@@ -77,3 +77,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Project Files
+# =========================
+
+# Build files
+*.js

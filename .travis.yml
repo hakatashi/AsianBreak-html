@@ -4,7 +4,7 @@ node_js:
   - '4'
   - 'node'
 install: npm install
-script: npm run build
+script: npm test
 notifications:
   webhooks: http://webhook.hakatashi.com/travis
   email:

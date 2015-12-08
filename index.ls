@@ -12,7 +12,10 @@ class asianbreak-html extends readable-stream.Transform
     @stack = []
 
   _transform: (chunk, encoding, done) ->
+    @push chunk
+    done()
 
   _flush: (done) ->
+    done()
 
 module.exports = asianbreak-html

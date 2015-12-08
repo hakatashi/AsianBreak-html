@@ -1,0 +1,32 @@
+{
+  "name": "asianbreak-html",
+  "version": "0.0.0",
+  "description": "Automatically strip breaklines from HTML for east asian people, based on new CSS3 spec of white-space property.",
+  "main": "index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hakatashi/AsianBreak-html.git"
+  },
+  "keywords": [
+    "asianbreak",
+    "breakline",
+    "HTML",
+    "Japanese",
+    "Chinese",
+    "Mongolian"
+  ],
+  "author": "Koki Takahashi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hakatashi/AsianBreak-html/issues"
+  },
+  "homepage": "https://github.com/hakatashi/AsianBreak-html#readme",
+  "dependencies": {
+    "asianbreak": "^1.0.1",
+    "html-tokenize": "^1.2.5",
+    "readable-stream": "^2.0.4"
+  }
+}

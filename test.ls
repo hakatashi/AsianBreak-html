@@ -16,6 +16,18 @@ convert = (text, done) ->
   asianbreak.end text
 
 describe 'Basic Usage' ->
+  It 'accepts string input and emit it as buffer' (done) ->
+    asianbreak = Asianbreak!
+    asianbreak.on \data -> expect it .to.be.instanceof Buffer
+    asianbreak.on \finish -> done!
+    asianbreak.end 'foobar'
+
+  It 'accepts buffer input and emit it as buffer' (done) ->
+    asianbreak = Asianbreak!
+    asianbreak.on \data -> expect it .to.be.instanceof Buffer
+    asianbreak.on \finish -> done!
+    asianbreak.end Buffer 'foobar'
+
   It 'parrots input with some simple cases' (done) ->
     convert '<p></p>' ->
       expect it .to.equal '<p></p>'

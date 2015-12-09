@@ -129,10 +129,34 @@ describe 'Convertion' ->
     ''' ->
       expect it .to.equal '''
         <p>
-          漢字<img src="/favicon.ico">汉字
+          漢字
+          <img src="/favicon.ico">
+          汉字
         </p>
       '''
       done!
+
+  It 'correctly handles HTML comments' (done) ->
+    convert '''
+      <p>
+        漢字
+        <!--
+          漢字
+          汉字
+        -->
+        汉字
+      </p>
+    ''' ->
+      expect it .to.equal '''
+        <p>
+          漢字
+          <!--
+            漢字
+            汉字
+          -->
+          汉字
+        </p>
+      '''
 
   It 'breaks inline context when block-level element appeared' (done) ->
     convert '''
@@ -185,5 +209,70 @@ describe 'Convertion' ->
       </div>
     ''' ->
       expect it .to.equal '''
-        
+        <div>
+          漢字
+          <pre>
+            漢字
+            汉字
+          </pre>
+          汉字
+        </div>
       '''
+      done!
+
+  It 'preserves newlines inside inline element inside <pre> tag' (done) ->
+    convert '''
+      <div>
+        漢字
+        <pre>
+          <h1>
+            漢字
+            汉字
+          </h1>
+        </pre>
+        汉字
+      </div>
+    ''' ->
+      expect it .to.equal '''
+        <div>
+          漢字
+          <pre>
+            <h1>
+              漢字
+              汉字
+            </h1>
+          </pre>
+          汉字
+        </div>
+      '''
+      done!
+
+  It 'ignores but pipes invalid closing element to output' (done) ->
+    convert '''
+      <p>
+        漢字
+        </span>
+        汉字
+      </p>
+    ''' ->
+      expect it .to.equal '''
+        <p>
+          漢字</span>汉字
+        </p>
+      '''
+      done!
+
+  It 'ignores but pipes unknown element to output' (done) ->
+    convert '''
+      <p>
+        漢字
+        <david>デビッド</david>
+        汉字
+      </p>
+    ''' ->
+      expect it .to.equal '''
+        <p>
+          漢字<david>デビッド</david>汉字
+        </p>
+      '''
+      done!

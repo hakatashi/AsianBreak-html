@@ -119,19 +119,16 @@ describe 'Convertion' ->
       '''
       done!
 
-  It 'correctly handles self-closing element' (done) ->
+  It 'correctly handles void element' (done) ->
     convert '''
       <p>
-        漢字
-        <img src="/favicon.ico">
+        漢字<img src="/favicon.ico">
         汉字
       </p>
     ''' ->
       expect it .to.equal '''
         <p>
-          漢字
-          <img src="/favicon.ico">
-          汉字
+          漢字<img src="/favicon.ico">汉字
         </p>
       '''
       done!
@@ -157,6 +154,7 @@ describe 'Convertion' ->
           汉字
         </p>
       '''
+      done!
 
   It 'breaks inline context when block-level element appeared' (done) ->
     convert '''

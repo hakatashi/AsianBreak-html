@@ -40,6 +40,31 @@ class asianbreak-html extends readable-stream.Transform
     noframes param rp rt script style template title
   ]>
 
+  # http://www.w3.org/TR/html5/syntax.html#optional-tags
+  # This module doesn't exactly implements omitment of start tag
+  # because of the consideration to even accept partial snnipet of HTML.
+  @auto-closing-rules =
+    li: <[li]>
+    dt: <[dt dd]>
+    dd: <[dt dd]>
+    p: <[
+      address article aside blockquote div dl fieldset
+      footer form h1 h2 h3 h4 h5 h6 header hgroup hr
+      main nav ol p pre section table ul
+    ]>
+    rb: <[rb rt rtc rp]>
+    rt: <[rb rt rtc rp]>
+    rtc: <[rb rtc rp]>
+    rp: <[rb rt rtc rp]>
+    optgroup: <[optgroup]>
+    option: <[option optgroup]>
+    thead: <[tbody tfoot]>
+    tbody: <[tbody tfoot]>
+    tfoot: <[tbody]>
+    tr: <[tr]>
+    td: <[td th]>
+    th: <[td th]>
+
   ~>
     super!
 

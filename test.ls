@@ -274,3 +274,64 @@ describe 'Convertion' ->
         </p>
       '''
       done!
+
+  It 'ignores elements rendered aside inline context' (done) ->
+    convert '''
+      <p>
+        漢字
+        <ruby><rb>漢</rb><rb>字</rb><rt>han</rt><rt>zi</rt></ruby>
+        汉字
+      </p>
+    ''' ->
+      expect it .to.equal '''
+        <p>
+          漢字<ruby><rb>漢</rb><rb>字</rb><rt>han</rt><rt>zi</rt></ruby>汉字
+        </p>
+      '''
+      done!
+
+  It 'ignores hidden elements and its descendant from translation' (done) ->
+    convert '''
+      <div>
+        漢字<noframes>
+          <p>
+            漢字
+            汉字
+          </p>
+        </noframes>
+        汉字
+      </div>
+    ''' ->
+      expect it .to.equal '''
+        <div>
+          漢字<noframes>
+            <p>
+              漢字
+              汉字
+            </p>
+          </noframes>汉字
+        </div>
+      '''
+
+  It 'supports some auto closing elements' (done) ->
+    convert '''
+      <p>
+        <ruby>
+          漢
+          <rb>字
+          <rt>かん
+          <rt>じ
+        </ruby>
+      <p>
+        汉字
+      </p>
+    ''' ->
+      expect it .to.equal '''
+        <p>
+          <ruby>
+            漢<rb>字<rt>かん<rt>じ
+          </ruby>
+        <p>
+          汉字
+        </p>
+      '''

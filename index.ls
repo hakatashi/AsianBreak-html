@@ -18,6 +18,28 @@ class asianbreak-html extends readable-stream.Transform
     isindex keygen link meta param source track wbr
   ]>
 
+  # Every element is inline by default.
+  # Firefox default style sheet defines `block` section to override this.
+  # http://hg.mozilla.org/mozilla-central/file/tip/layout/style/html.css#l99
+  @block-elements = <[
+    address article aside blockquote body button caption
+    center col colgroup dd details dic dir div dl dt
+    fieldset figcaption figure footer foreignobject form
+    frame frameset h1 h2 h3 h4 h5 h6 header hgroup hr
+    html input isindex keygen layer legend li listing
+    main marquee menu multicol nav ol optgroup option p
+    plaintext pre progress rt section select summary
+    table tbody td text textarea tfoot th thead tr ul
+    videocontrols xmp xul
+  ]>
+
+  # Elements supposed to have display:none; style or
+  # to be rendered aside inline context, such as <rt>.
+  @hidden-elements = <[
+    area base basefont datalist head link meta noembed
+    noframes param rp rt script style template title
+  ]>
+
   ~>
     super!
 

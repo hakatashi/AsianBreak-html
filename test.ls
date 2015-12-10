@@ -15,7 +15,7 @@ convert = (text, done) ->
   asianbreak.pipe concat-stream {encoding: \string} done
   asianbreak.end text
 
-describe 'Basic Usage' ->
+describe 'Interface' ->
   It 'accepts string input and emit it as buffer' (done) ->
     asianbreak = Asianbreak!
     asianbreak.on \data -> expect it .to.be.instanceof Buffer

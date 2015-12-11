@@ -75,7 +75,7 @@ parse-token = ([type, token]) ->
       assert false
 
 # Check if given two tokens are "corresponding"
-chack-corresponence = (token-a, token-b) ->
+check-correspondence = (token-a, token-b) ->
   return false if token-a.category isnt token-b.category
 
   if token-a.type is \open
@@ -188,7 +188,11 @@ class asianbreak-html extends readable-stream.Transform
         # If token is doctype or unknown, it not actually opens token. Just ignore it.
         | \doctype \unknown => # nop
 
-        | \comment => #nop
+        | \comment =>
+          @in-comment = true
+
+        | \cdata =>
+          @in-cdata = true
 
         | \element =>
           # Execute auto-closing
@@ -201,17 +205,28 @@ class asianbreak-html extends readable-stream.Transform
 
     else if token.type is \close
       # Skip if no corresponding open tag is found in stack
-      unless @stack.every((token-index) ~> chack-corresponence @tokens[token-index], token)
-        # Iterate through stack and close unmatched elements one by one
-        loop
-          top-token = @_top-stack!
-          @_close-token!
+      unless @stack.every((token-index) ~> not check-correspondence @tokens[token-index], token)
+        switch token.category
+          | \comment =>
+            @in-comment = false
 
-          if top-token.name is token.name
-            break
+          | \cdata =>
+            @in-cdata = false
+
+          | \element =>
+            # Iterate through stack and close unmatched elements one by one
+            loop
+              top-token = @_top-stack!
+              @_close-token!
+
+              if check-correspondence top-token, token
+                break
 
     else if token.type is \text
-      @inline-tokens.push token
+      if @in-comment or @in-cdata or @in-pre
+        token.processed = true
+      else
+        @inline-tokens.push token
 
     # Unknown token type
     else assert false

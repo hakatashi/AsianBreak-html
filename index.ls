@@ -145,8 +145,7 @@ class asianbreak-html extends readable-stream.Transform
     # Point the next token index of the newest flushed token
     @flush-pointer = 0
 
-    @tokenizer.on \data @_on-data.bind @
-    @tokenizer.on \finish ~> console.log @stack, @tokens
+    @tokenizer.on \data ~> @_on-data ...
 
   _transform: (chunk, encoding, done) ->
     @tokenizer.write chunk, encoding, done
@@ -183,6 +182,9 @@ class asianbreak-html extends readable-stream.Transform
           if top-token.name is token.name
             break
 
+    else if token.type is \text
+      @inline-tokens.push token
+
   # Close the element on the topmost of the stack
   _close-token: ->
     opening-token = @_pop-stack!
@@ -210,6 +212,8 @@ class asianbreak-html extends readable-stream.Transform
 
     # Reset
     @inline-tokens = []
+
+  ### Stack Operators ###
 
   _top-stack: -> @tokens[@stack[* - 1]]
 

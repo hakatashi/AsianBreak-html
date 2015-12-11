@@ -141,20 +141,30 @@ class asianbreak-html extends readable-stream.Transform
     @tokenizer = html-tokenize()
     @stack = []
     @tokens = []
+    @inline-tokens = []
+    # Point the next token index of the newest flushed token
+    @flush-pointer = 0
 
     @tokenizer.on \data @_on-data.bind @
+
+  _transform: (chunk, encoding, done) ->
+    @tokenizer.write chunk, encoding, done
+
+  _flush: (done) ->
+    @tokenizer.end done
 
   _on-data: (chunk) ->
     token = parse-token chunk
     token-index = @tokens.push token
     token.index = --token-index
+    token.processed = false
 
     top-token = @_top-stack!
 
     if token.type is \open
       # Execute auto-closing
       if top-token? and token.name in (@@auto-closing-rules[top-token.name] ? [])
-        ...
+        @_close-token!
 
       @stack.push token-index
 
@@ -167,12 +177,40 @@ class asianbreak-html extends readable-stream.Transform
 
     @push chunk[1]
 
+  _close-token: ->
+    opening-token = @_pop-stack!
+
+    if opening-token.name not in @@block-elements
+      texts = @inline-tokens.map (token) -> token.text
+      processed-texts = asianbreak texts
+
+      for token, token-index in @inline-tokens
+        token.text = processed-texts[token-index]
+        token.processed = true
+        @_flush-tokens!
+
   _top-stack: -> @tokens[@stack[* - 1]]
 
-  _transform: (chunk, encoding, done) ->
-    @tokenizer.write chunk, encoding, done
+  _pop-stack: ->
+    popped-token = @_top-stack!
+    @stack.pop!
+    return popped-token
 
-  _flush: (done) ->
-    @tokenizer.end done
+  # Find tokens which is already processed but not flushed,
+  # and flush it to output text
+  _flush-tokens: ->
+    push-text = ''
+
+    for token-index from @flush-pointer til @tokens.length
+      token = @tokens[token-index]
+
+      unless token.type isnt \text or token.processed
+        break
+      else
+        push-text += token.text
+        @flush-pointer = token.index + 1
+
+    if push-text.length isnt 0
+      @push push-text
 
 module.exports = asianbreak-html

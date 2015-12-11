@@ -74,6 +74,22 @@ parse-token = ([type, token]) ->
     | otherwise
       assert false
 
+# Check if given two tokens are "corresponding"
+chack-corresponence = (token-a, token-b) ->
+  return false if token-a.category isnt token-b.category
+
+  if token-a.type is \open
+    return false if token-b.type isnt \close
+  else if token-a.type is \close
+    return false if token-b.type isnt \open
+  else
+    return false
+
+  if token-a.category is \element
+    return token-a.name is token-b.name
+  else
+    return true
+
 class asianbreak-html extends readable-stream.Transform
   # See browser's default stylesheets
   # http://trac.webkit.org/browser/trunk/Source/WebCore/css/html.css
@@ -145,6 +161,10 @@ class asianbreak-html extends readable-stream.Transform
     # Point the next token index of the newest flushed token
     @flush-pointer = 0
 
+    @in-comment = false
+    @in-pre = false
+    @in-cdata = false
+
     @tokenizer.on \data ~> @_on-data ...
     @tokenizer.on \end ~> @_on-end ...
 
@@ -164,19 +184,24 @@ class asianbreak-html extends readable-stream.Transform
     top-token = @_top-stack!
 
     if token.type is \open
-      # If token is doctype or unknown, it not actually opens token. Just ignore it.
-      unless token.category is \doctype or token.category is \unknown
-        # Execute auto-closing
-        if top-token? and token.name in (@@auto-closing-rules[top-token.name] ? [])
-          @_close-token!
+      switch token.category
+        # If token is doctype or unknown, it not actually opens token. Just ignore it.
+        | \doctype \unknown => # nop
 
-        @_open-token token
+        | \comment => #nop
+
+        | \element =>
+          # Execute auto-closing
+          if top-token? and token.name in (@@auto-closing-rules[top-token.name] ? [])
+            @_close-token!
+
+          @_open-token token
+
+        | otherwise => assert false
 
     else if token.type is \close
       # Skip if no corresponding open tag is found in stack
-      unless @stack.every((token-index) ~>
-        @tokens[token-index].name isnt token.name
-      )
+      unless @stack.every((token-index) ~> chack-corresponence @tokens[token-index], token)
         # Iterate through stack and close unmatched elements one by one
         loop
           top-token = @_top-stack!

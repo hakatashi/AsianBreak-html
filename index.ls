@@ -164,11 +164,13 @@ class asianbreak-html extends readable-stream.Transform
     top-token = @_top-stack!
 
     if token.type is \open
-      # Execute auto-closing
-      if top-token? and token.name in (@@auto-closing-rules[top-token.name] ? [])
-        @_close-token!
+      # If token is doctype or unknown, it not actually opens token. Just ignore it.
+      unless token.category is \doctype or token.category is \unknown
+        # Execute auto-closing
+        if top-token? and token.name in (@@auto-closing-rules[top-token.name] ? [])
+          @_close-token!
 
-      @_open-token token
+        @_open-token token
 
     else if token.type is \close
       # Skip if no corresponding open tag is found in stack

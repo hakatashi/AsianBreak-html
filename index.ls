@@ -140,12 +140,34 @@ class asianbreak-html extends readable-stream.Transform
 
     @tokenizer = html-tokenize()
     @stack = []
+    @tokens = []
 
-    @tokenizer.on \data @_on-data
+    @tokenizer.on \data @_on-data.bind @
 
-  _on-data: (chunk) ~>
+  _on-data: (chunk) ->
     token = parse-token chunk
+    token-index = @tokens.push token
+    token.index = --token-index
+
+    top-token = @_top-stack!
+
+    if token.type is \open
+      # Execute auto-closing
+      if top-token? and token.name in (@@auto-closing-rules[top-token.name] ? [])
+        ...
+
+      @stack.push token-index
+
+    else if token.type is \close
+      # Skip if no corresponding open tag is found in stack
+      unless @stack.every((token-index) ~>
+        @tokens[token-index].name isnt token.name
+      )
+        ...
+
     @push chunk[1]
+
+  _top-stack: -> @tokens[@stack[* - 1]]
 
   _transform: (chunk, encoding, done) ->
     @tokenizer.write chunk, encoding, done

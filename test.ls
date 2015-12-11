@@ -329,7 +329,9 @@ describe 'Convertion' ->
       expect it .to.equal '''
         <p>
           <ruby>
-            漢<rb>字<rt>かん<rt>じ
+            漢<rb>字
+            <rt>かん
+            <rt>じ
           </ruby>
         <p>
           汉字

@@ -218,6 +218,30 @@ describe 'Convertion' ->
       '''
       done!
 
+  It 'correctly handles unclosed <pre> tag' (done) ->
+    convert '''
+      <div>
+        <div>
+          <pre>
+            漢字
+            汉字
+        </div>
+        漢字
+        汉字
+      </div>
+    ''' ->
+      expect it .to.equal '''
+        <div>
+          <div>
+            <pre>
+              漢字
+              汉字
+          </div>
+          漢字汉字
+        </div>
+      '''
+      done!
+
   It 'preserves newlines inside inline element inside <pre> tag' (done) ->
     convert '''
       <div>
@@ -248,8 +272,7 @@ describe 'Convertion' ->
   It 'ignores but pipes invalid closing element to output' (done) ->
     convert '''
       <p>
-        漢字
-        </span>
+        漢字</span>
         汉字
       </p>
     ''' ->

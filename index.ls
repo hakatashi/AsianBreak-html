@@ -146,6 +146,7 @@ class asianbreak-html extends readable-stream.Transform
     @flush-pointer = 0
 
     @tokenizer.on \data ~> @_on-data ...
+    @tokenizer.on \end ~> @_on-end ...
 
   _transform: (chunk, encoding, done) ->
     @tokenizer.write chunk, encoding, done
@@ -184,6 +185,10 @@ class asianbreak-html extends readable-stream.Transform
 
     else if token.type is \text
       @inline-tokens.push token
+
+  _on-end: ->
+    until @stack.length is 0
+      @_close-token!
 
   # Close the element on the topmost of the stack
   _close-token: ->

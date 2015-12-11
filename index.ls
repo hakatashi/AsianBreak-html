@@ -247,7 +247,10 @@ class asianbreak-html extends readable-stream.Transform
     if token.name in @@block-elements
       @_process-inline-tokens!
 
-    @_push-stack token
+    # If token is void element, element is immediately closed and
+    # should not be pushed into stack
+    unless token.name in @@void-elements
+      @_push-stack token
 
   # Process @inline-tokens to asianbreak module and transform back to them
   _process-inline-tokens: ->

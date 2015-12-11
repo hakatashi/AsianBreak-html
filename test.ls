@@ -312,6 +312,7 @@ describe 'Convertion' ->
           </noframes>汉字
         </div>
       '''
+      done!
 
   It 'supports some auto closing elements' (done) ->
     convert '''
@@ -337,3 +338,16 @@ describe 'Convertion' ->
           汉字
         </p>
       '''
+      done!
+
+  It 'emits remaining texts when stream ends without element closing' (done) ->
+    convert '''
+      <p>
+        漢字
+        汉字
+    ''' ->
+      expect it .to.equal '''
+        <p>
+          漢字汉字
+      '''
+      done!

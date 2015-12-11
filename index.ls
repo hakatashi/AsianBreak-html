@@ -188,6 +188,9 @@ class asianbreak-html extends readable-stream.Transform
     else if token.type is \text
       @inline-tokens.push token
 
+    # Unknown token type
+    else assert false
+
   _on-end: ->
     until @stack.length is 0
       @_close-token!

@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/hakatashi/AsianBreak-html#readme",
   "dependencies": {
-    "asianbreak": "^1.0.1",
+    "asianbreak": "^1.0.2",
     "html-tokenize": "^1.2.5",
     "readable-stream": "^2.0.4"
   },

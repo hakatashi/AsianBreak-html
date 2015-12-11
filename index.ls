@@ -2,7 +2,54 @@ require! {
   \asianbreak
   \html-tokenize
   \readable-stream
+  \assert
 }
+
+# Very very lazy parser for HTML token.
+# It is not accutual parser, just "estimating" the property of token.
+# It works well given token type is already detected.
+parse-token = ([type, token]) ->
+  switch type
+    | \open
+      if token.match /^<!--/
+        {
+          type: type
+          comment: true
+        }
+      else
+        name-match = token.match /[a-zA-Z]+/
+        assert name-match isnt null
+
+        {
+          type: type
+          comment: false
+          name: name-match.0
+        }
+
+    | \close
+      if token.match /^-->/
+        {
+          type: type
+          comment: true
+        }
+      else
+        name-match = token.match /[a-zA-Z]+/
+        assert name-match isnt null
+
+        {
+          type: type
+          comment: false
+          name: name-match.0
+        }
+
+    | \text
+      {
+        type: type
+        text: token
+      }
+
+    | otherwise
+      assert false
 
 class asianbreak-html extends readable-stream.Transform
   # See browser's default stylesheets

@@ -146,6 +146,7 @@ class asianbreak-html extends readable-stream.Transform
     @flush-pointer = 0
 
     @tokenizer.on \data @_on-data.bind @
+    @tokenizer.on \finish ~> console.log @stack, @tokens
 
   _transform: (chunk, encoding, done) ->
     @tokenizer.write chunk, encoding, done
@@ -157,6 +158,7 @@ class asianbreak-html extends readable-stream.Transform
     token = parse-token chunk
     token-index = @tokens.push token
     token.index = --token-index
+    token.original = chunk[1]
     token.processed = false
 
     top-token = @_top-stack!
@@ -166,28 +168,48 @@ class asianbreak-html extends readable-stream.Transform
       if top-token? and token.name in (@@auto-closing-rules[top-token.name] ? [])
         @_close-token!
 
-      @stack.push token-index
+      @_open-token token
 
     else if token.type is \close
       # Skip if no corresponding open tag is found in stack
       unless @stack.every((token-index) ~>
         @tokens[token-index].name isnt token.name
       )
-        ...
+        # Iterate through stack and close unmatched elements one by one
+        loop
+          top-token = @_top-stack!
+          @_close-token!
 
-    @push chunk[1]
+          if top-token.name is token.name
+            break
 
+  # Close the element on the topmost of the stack
   _close-token: ->
     opening-token = @_pop-stack!
 
-    if opening-token.name not in @@block-elements
-      texts = @inline-tokens.map (token) -> token.text
-      processed-texts = asianbreak texts
+    if opening-token.name in @@block-elements
+      @_process-inline-tokens!
 
-      for token, token-index in @inline-tokens
-        token.text = processed-texts[token-index]
-        token.processed = true
-        @_flush-tokens!
+  # Open new token
+  _open-token: (token) ->
+    if token.name in @@block-elements
+      @_process-inline-tokens!
+
+    @_push-stack token
+
+  # Process @inline-tokens to asianbreak module and transform back to them
+  _process-inline-tokens: ->
+    texts = @inline-tokens.map (token) -> token.text
+    processed-texts = asianbreak texts
+
+    for token, token-index in @inline-tokens
+      token.text = processed-texts[token-index]
+      token.processed = true
+
+    @_flush-tokens!
+
+    # Reset
+    @inline-tokens = []
 
   _top-stack: -> @tokens[@stack[* - 1]]
 
@@ -195,6 +217,8 @@ class asianbreak-html extends readable-stream.Transform
     popped-token = @_top-stack!
     @stack.pop!
     return popped-token
+
+  _push-stack: (token) -> @stack.push token.index
 
   # Find tokens which is already processed but not flushed,
   # and flush it to output text
@@ -207,7 +231,11 @@ class asianbreak-html extends readable-stream.Transform
       unless token.type isnt \text or token.processed
         break
       else
-        push-text += token.text
+        if token.type is \text
+          push-text += token.text
+        else
+          push-text += token.original
+
         @flush-pointer = token.index + 1
 
     if push-text.length isnt 0

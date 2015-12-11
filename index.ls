@@ -9,37 +9,60 @@ require! {
 # It is not accutual parser, just "estimating" the property of token.
 # It works well given token type is already detected.
 parse-token = ([type, token]) ->
+  if token |> Buffer.is-buffer
+    token .= to-string!
+
   switch type
     | \open
       if token.match /^<!--/
         {
           type: type
-          comment: true
+          category: \comment
+        }
+      else if token.match /^<!DOCTYPE/i
+        {
+          type: type
+          category: \doctype
+        }
+      else if token.match /^<!\[CDATA\[/i
+        {
+          type: type
+          category: \cdata
+        }
+      else if token.match /^<[!?]/
+        {
+          type: type
+          category: \unknown
         }
       else
-        name-match = token.match /[a-zA-Z]+/
+        name-match = token.match /^<\s*([^\s>]+)/
         assert name-match isnt null
 
         {
           type: type
-          comment: false
-          name: name-match.0
+          category: \element
+          name: name-match.1
         }
 
     | \close
       if token.match /^-->/
         {
           type: type
-          comment: true
+          category: \comment
+        }
+      else if token.match /^\]\]>/
+        {
+          type: type
+          category: \cdata
         }
       else
-        name-match = token.match /[a-zA-Z]+/
+        name-match = token.match /^<\/\s*([^\s>]+)/
         assert name-match isnt null
 
         {
           type: type
-          comment: false
-          name: name-match.0
+          category: \element
+          name: name-match.1
         }
 
     | \text
@@ -118,11 +141,16 @@ class asianbreak-html extends readable-stream.Transform
     @tokenizer = html-tokenize()
     @stack = []
 
+    @tokenizer.on \data @_on-data
+
+  _on-data: (chunk) ~>
+    token = parse-token chunk
+    @push chunk[1]
+
   _transform: (chunk, encoding, done) ->
-    @push chunk
-    done()
+    @tokenizer.write chunk, encoding, done
 
   _flush: (done) ->
-    done()
+    @tokenizer.end done
 
 module.exports = asianbreak-html

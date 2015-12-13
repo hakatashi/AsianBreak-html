@@ -1,6 +1,6 @@
 {
   "name": "asianbreak-html",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Automatically strip breaklines from HTML for east asian people, based on new CSS3 spec of white-space property.",
   "main": "index.js",
   "files": [

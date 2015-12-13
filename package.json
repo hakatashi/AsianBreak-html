@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "Automatically strip breaklines from HTML for east asian people, based on new CSS3 spec of white-space property.",
   "main": "index.js",
+  "files": [
+    "*.js"
+  ],
   "scripts": {
     "test": "gulp test",
     "build": "gulp build"

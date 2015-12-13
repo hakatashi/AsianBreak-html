@@ -165,6 +165,8 @@ class asianbreak-html extends readable-stream.Transform
     @in-pre = false
     @in-cdata = false
 
+    @pre-start-token = null
+
     @tokenizer.on \data ~> @_on-data ...
     @tokenizer.on \end ~> @_on-end ...
 
@@ -222,6 +224,8 @@ class asianbreak-html extends readable-stream.Transform
               if check-correspondence top-token, token
                 break
 
+          | otherwise => assert false
+
     else if token.type is \text
       if @in-comment or @in-cdata or @in-pre
         token.processed = true
@@ -239,13 +243,23 @@ class asianbreak-html extends readable-stream.Transform
   _close-token: ->
     opening-token = @_pop-stack!
 
+    if opening-token is @pre-start-token
+      @in-pre = false
+      @pre-start-token = null
+
     if opening-token.name in @@block-elements
       @_process-inline-tokens!
 
   # Open new token
   _open-token: (token) ->
-    if token.name in @@block-elements
-      @_process-inline-tokens!
+    if token.category is \element
+      if token.name in @@block-elements
+        @_process-inline-tokens!
+
+      unless @in-pre
+        if token.name in @@pre-elements or token.name in @@hidden-elements
+          @in-pre = true
+          @pre-start-token = token
 
     # If token is void element, element is immediately closed and
     # should not be pushed into stack

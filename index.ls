@@ -243,23 +243,23 @@ class asianbreak-html extends readable-stream.Transform
   _close-token: ->
     opening-token = @_pop-stack!
 
+    if not @in-pre and opening-token.name in @@block-elements
+      @_process-inline-tokens!
+
     if opening-token is @pre-start-token
       @in-pre = false
       @pre-start-token = null
 
-    if opening-token.name in @@block-elements
-      @_process-inline-tokens!
-
   # Open new token
   _open-token: (token) ->
     if token.category is \element
-      if token.name in @@block-elements
-        @_process-inline-tokens!
-
       unless @in-pre
         if token.name in @@pre-elements or token.name in @@hidden-elements
           @in-pre = true
           @pre-start-token = token
+
+      if not @in-pre and token.name in @@block-elements
+        @_process-inline-tokens!
 
     # If token is void element, element is immediately closed and
     # should not be pushed into stack

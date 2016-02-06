@@ -192,9 +192,11 @@ class asianbreak-html extends readable-stream.Transform
 
         | \comment =>
           @in-comment = true
+          @_open-token token
 
         | \cdata =>
           @in-cdata = true
+          @_open-token token
 
         | \element =>
           # Execute auto-closing
@@ -211,9 +213,11 @@ class asianbreak-html extends readable-stream.Transform
         switch token.category
           | \comment =>
             @in-comment = false
+            @_close-token!
 
           | \cdata =>
             @in-cdata = false
+            @_close-token!
 
           | \element =>
             # Iterate through stack and close unmatched elements one by one

@@ -137,21 +137,23 @@ describe 'Convertion' ->
     convert '''
       <p>
         漢字
+        汉字
         <!--
           漢字
           汉字
         -->
+        漢字
         汉字
       </p>
     ''' ->
       expect it .to.equal '''
         <p>
-          漢字
+          漢字汉字
           <!--
             漢字
             汉字
           -->
-          汉字
+          漢字汉字
         </p>
       '''
       done!

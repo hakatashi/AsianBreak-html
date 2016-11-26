@@ -30,7 +30,7 @@
   "homepage": "https://github.com/hakatashi/AsianBreak-html#readme",
   "dependencies": {
     "asianbreak": "^1.0.2",
-    "html-tokenize": "^1.2.5",
+    "html-tokenize": "^2.0.0",
     "readable-stream": "^2.0.4"
   },
   "devDependencies": {

@@ -1,7 +1,5 @@
 # AsianBreak-html
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/hakatashi/AsianBreak-html.svg)](https://greenkeeper.io/)
-
 > Automatically strip breaklines from HTML for east asian people, based on new CSS3 spec of white-space property.
 
 [travis-image]: https://travis-ci.org/hakatashi/AsianBreak-html.svg?branch=master
@@ -19,6 +17,7 @@
 [![Dependency Status][gemnasium-image]][gemnasium-url]
 [![npm version][npm-image]][npm-url]
 [![LICENSE][license-image]][npm-url]
+[![Greenkeeper badge](https://badges.greenkeeper.io/hakatashi/AsianBreak-html.svg)](https://greenkeeper.io/)
 
 ```js
 const Asianbreak = require('asianbreak-html');

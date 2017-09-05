@@ -34,7 +34,7 @@
     "readable-stream": "^2.0.4"
   },
   "devDependencies": {
-    "chai": "^3.4.1",
+    "chai": "^4.1.0",
     "concat-stream": "^1.5.1",
     "gulp": "^3.9.0",
     "gulp-livescript": "^3.0.0",
